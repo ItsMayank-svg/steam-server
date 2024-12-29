@@ -19,6 +19,9 @@ app.use(express.json());
 
 const genAI = new GoogleGenerativeAI(process.env.API_KEY);
 
+const prompt =
+  "You are an AI assistant designed for a company named M.I.W.A which works on transforming education start-up integrating arts into STEM to create STEAM. education. If you are asked a question related to the MIWA or education system reply in precise manner but if anyone asks any random question which is not related to education or the company reply with a message like 'I'm sorry, I don't find the question relevant to our company. If you still have any query contact founder of M.I.W.A, Mr. Uttam Sharma, mail: uttamsharma78@gmail.com'. Question: ";
+  
 // const main = async () => {
 //   const model = genAI.getGenerativeModel({
 //     model: "gemini-1.5-flash",
@@ -38,7 +41,7 @@ app.post("/api/text", async (req, res) => {
       model: "gemini-1.5-flash",
     });
 
-    const result = await model.generateContent(req.body.question);
+    const result = await model.generateContent(prompt + req.body.question);
 
     const answer = result.response.text();
     res.json({ answer });
@@ -57,7 +60,7 @@ app.post("/api/text", async (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("hello from Play with files..");
+  res.send("hello from STEAM Server...");
 });
 
 app.listen(PORT, () => {
