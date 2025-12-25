@@ -25,7 +25,7 @@ const prompt =
 app.post("/api/text", async (req, res) => {
   try {
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
+      model: "gemini-1.5-flash-latest",
     });
 
     const result = await model.generateContent(prompt + req.body.question);
@@ -54,3 +54,4 @@ app.get("/", (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
 });
+
