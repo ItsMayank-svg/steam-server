@@ -10,7 +10,7 @@ console.log("🚀 Voice To Intent backend starting...");
 
 /* CORS */
 const corsOptions = {
-  origin: ["https://voice-to-intent.vercel.app"],
+  origin: ["http://localhost:5173", "https://voice-to-intent.vercel.app"],
   methods: ["POST", "GET", "OPTIONS"],
   allowedHeaders: ["Content-Type"],
 };
@@ -29,7 +29,7 @@ app.get("/", (req, res) => {
 /* INTENT EXTRACTION ENDPOINT */
 app.post("/api/intent", async (req, res) => {
   const { text } = req.body;
-
+  console.log(text);
   if (!text || !text.trim()) {
     return res.status(400).json({
       message: "Text input is required",
@@ -40,12 +40,11 @@ app.post("/api/intent", async (req, res) => {
     const model = genAI.getGenerativeModel({
       model: "gemini-2.5-flash",
     });
-
-    const prompt = `
+const prompt = `
 You are an intent extraction engine.
 
 A person may speak casually and emotionally.
-Your task is to extract and NORMALIZE intent.
+Your task is to extract and NORMALIZE intent, and then provide helpful suggestions.
 
 Rules:
 - Do NOT repeat the user's sentence verbatim
@@ -53,6 +52,10 @@ Rules:
 - If the user is unsure or choosing between options, classify as "decisions"
 - Only classify as "questions" if asking for factual information
 - Do NOT convert decisions into questions
+- Suggestions must be practical and actionable
+- Suggestions should help the user achieve or manage the extracted intents
+- Suggestions must NOT introduce new tasks, reminders, decisions, or questions
+- Keep suggestions concise (1–2 lines each)
 - Return ONLY valid JSON
 - No markdown
 - No explanations
@@ -62,12 +65,15 @@ Format:
   "tasks": [],
   "reminders": [],
   "decisions": [],
-  "questions": []
+  "questions": [],
+  "suggestions": []
 }
 
 Input:
 "${text}"
 `;
+
+
 
     const result = await model.generateContent(prompt);
     const rawResponse = result.response.text();
@@ -82,6 +88,7 @@ Input:
         reminders: [],
         decisions: [],
         questions: [],
+        suggestions: [],
       };
     }
 
@@ -93,6 +100,7 @@ Input:
       reminders: [],
       decisions: [],
       questions: [],
+      suggestions: [],
     });
   }
 });
